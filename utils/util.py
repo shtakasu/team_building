@@ -60,12 +60,16 @@ def optimization(neben_df, team_df, condition3, condition4, condition6):
                 if t in neben2preteam[n]:
                     problem += x[n,t] == 0
     
-    #Condition 7: Given nebens must be assigned to the liaison teams
-    liaison_neben = neben_df[neben_df["liaison"]=="Y"]["name"].to_list()
-    liaison_team = team_df[team_df["liaison"]=="Y"]["team"].to_list()
+    #Condition 7: Given nebens must be assigned to the liaison teams or the ward teams
+    liaison_neben = neben_df[neben_df["liaisonORward"]=="L"]["name"].to_list()
+    liaison_team = team_df[team_df["liaisonORward"]=="L"]["team"].to_list()
+    ward_neben = neben_df[neben_df["liaisonORward"]=="W"]["name"].to_list()
+    ward_team = team_df[team_df["liaisonORward"]=="W"]["team"].to_list()
     for n in liaison_neben:
         problem += pulp.lpSum([x[n,t] for t in liaison_team]) == 1
-
+    for n in ward_neben:
+        problem += pulp.lpSum([x[n,t] for t in ward_team]) == 1
+        
     #solve
     status = problem.solve()
     if pulp.LpStatus[status] == "Optimal":
