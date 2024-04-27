@@ -59,6 +59,12 @@ def optimization(neben_df, team_df, condition3, condition4, condition6):
             for t in team:
                 if t in neben2preteam[n]:
                     problem += x[n,t] == 0
+    
+    #Condition 7: Given nebens must be assigned to the liaison teams
+    liaison_neben = neben_df[neben_df["liaison"]=="Y"]["name"].to_list()
+    liaison_team = team_df[team_df["liaison"]=="Y"]["team"].to_list()
+    for n in liaison_neben:
+        problem += pulp.lpSum([x[n,t] for t in liaison_team]) == 1
 
     #solve
     status = problem.solve()
